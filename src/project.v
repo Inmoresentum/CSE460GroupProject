@@ -1,7 +1,11 @@
-module project(input clk, input [3:0] A, input [3:0] B,
- input [2:0] opcode, output reg [3:0] C);
-
+module project(clk, A, B, opcode, C, car, sign, zero);
+input clk;
+input [3:0] A;
+input [3:0] B;
+input [2:0] opcode;
+output reg [3:0] C;
 reg [2:0] state = 0;
+output reg car = 0, sign, zero;
 
 always @(posedge clk) begin
     case (state)
@@ -41,6 +45,8 @@ always @(posedge clk) begin
            end
         3: begin // State 3
                C[3] <= ~(A[3] & B[3]); // Perform NAND operation on MSBs and update C
+               sign <= C[3];
+			   zero <= (C == 4'b0000);
                if (opcode != 3'b011) begin
                    state <= 0; // Return to idle state if opcode is not 010 NAND
                end
@@ -52,6 +58,7 @@ always @(posedge clk) begin
                      state <= 0; // Return to idle state if undefined state is reached
                  end
     endcase
+  
 end
 
 endmodule
