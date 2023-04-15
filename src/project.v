@@ -64,8 +64,8 @@ always @ (posedge clk) begin
                     zero <= zero & (C[2] == 1'b0);
                 end
                 3'b010: begin //SUB operation on next bit
-                    {carr, C[2]} <= B[2] - A[2] - carr;
-                    zero <= zero & (C[2] == 1'b0);
+                    {carr, C[2]} <= B[2] - A[2] - (carr & ~zero);
+					zero <= zero & (C[2] == 1'b0);
                 end
                 3'b011: begin //NAND operation on next bit
                     C[2] <= ~(A[2] & B[2]);
