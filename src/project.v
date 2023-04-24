@@ -1,4 +1,4 @@
-module testing(input clk, input [3:0] A, input [3:0] B,
+module project(input clk, input [3:0] A, input [3:0] B,
  input [2:0] opcode, output reg [3:0] C,
   output reg carr, output reg sign, output reg zero);
 // Will be using state to indicate state of the machine.
