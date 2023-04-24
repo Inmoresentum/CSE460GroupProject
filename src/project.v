@@ -1,8 +1,12 @@
-module project(input clk, input [3:0] A, input [3:0] B,
+module testing(input clk, input [3:0] A, input [3:0] B,
  input [2:0] opcode, output reg [3:0] C,
   output reg carr, output reg sign, output reg zero);
 // Will be using state to indicate state of the machine.
 reg [1:0] state = 0;
+// Negative numbers will be represented in 2s complement.
+reg signed [3:0] sub_result;
+reg signed [3:0] sub_a;
+reg signed [3:0] sub_b;
 always @ (posedge clk) begin
     case (state)
         2'b00: begin
@@ -18,7 +22,10 @@ always @ (posedge clk) begin
                     zero <= C[0] == 1'b0;
                 end
                 3'b010: begin //SUB operation on LSBs
-                    {carr, C[0]} <= B[0] - A[0];
+		    sub_a <= A;
+		    sub_b <= B;
+                    sub_result <= sub_b - sub_a;
+                    C[0] <= sub_result[0];
                     zero <= C[0] == 1'b0;
                end
                 3'b011: begin //NAND operation on LSBs
@@ -30,7 +37,7 @@ always @ (posedge clk) begin
                     zero <= C[0] == 1'b0;
                 end
                 
-                
+            
             endcase
             state <= 2'b01;
         end
@@ -41,8 +48,11 @@ always @ (posedge clk) begin
                     zero <= zero & (C[1] == 1'b0);
                 end
                 3'b010: begin //SUB operation on next bit
-                    {carr, C[1]} <= B[1] - A[1] - carr;
-                    zero <= zero & (C[1] == 1'b0);
+		    sub_a <= A;
+		    sub_b <= B;
+                    sub_result <= sub_b - sub_a;
+                    C[1] <= sub_result[1];
+                    zero <= C[1] == 1'b0;
                 end 
                 3'b011: begin //NAND operation on next bit
                     C[1] <= ~(A[1] & B[1]);
@@ -64,8 +74,11 @@ always @ (posedge clk) begin
                     zero <= zero & (C[2] == 1'b0);
                 end
                 3'b010: begin //SUB operation on next bit
-                    {carr, C[2]} <= B[2] - A[2] - (carr & ~zero);
-					zero <= zero & (C[2] == 1'b0);
+		    sub_a <= A;
+		    sub_b <= B;
+                    sub_result <= sub_b - sub_a;
+                    C[2] <= sub_result[2];
+                    zero <= C[2] == 1'b0;
                 end
                 3'b011: begin //NAND operation on next bit
                     C[2] <= ~(A[2] & B[2]);
@@ -87,16 +100,14 @@ always @ (posedge clk) begin
                     zero <= C == 4'b0000;
                 end
                 3'b010: begin //SUB operation on MSBs
-                 {carr, C[3]} <= B[3] - A[3] - carr;
-                 sign <= C[3];
-                 zero <= C == 4'b0000;
-                   if (B[3] < A[3]) begin //if result is negative, take two's complement of result
-                       C <= ~C + 4'b0001;
-                       sign <= C[3];
-                   end
+		    sub_a <= A;
+		    sub_b <= B;
+                    {carr, sub_result} <= sub_b - sub_a;
+                    C[3] <= sub_result[3];
+                    zero <= C == 4'b0000;
                 end
                 3'b011: begin //NAND operation on MSBs
-                                    C[3] <= ~(A[3] & B[3]);
+                    C[3] <= ~(A[3] & B[3]);
                     sign <= C[3];
                     zero <= C == 4'b0000;
                 end
