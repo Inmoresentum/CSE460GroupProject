@@ -22,8 +22,8 @@ always @ (posedge clk) begin
                     zero <= C[0] == 1'b0;
                 end
                 3'b010: begin //SUB operation on LSBs
-		    sub_a <= A;
-		    sub_b <= B;
+					sub_a <= A;
+					sub_b <= B;
                     sub_result <= sub_b - sub_a;
                     C[0] <= sub_result[0];
                     zero <= C[0] == 1'b0;
@@ -39,7 +39,9 @@ always @ (posedge clk) begin
                 
             
             endcase
-            state <= 2'b01;
+            if (opcode != 3'b000) begin
+				state <= 2'b01;
+			end
         end
         2'b01: begin
             case (opcode)
@@ -48,8 +50,8 @@ always @ (posedge clk) begin
                     zero <= zero & (C[1] == 1'b0);
                 end
                 3'b010: begin //SUB operation on next bit
-		    sub_a <= A;
-		    sub_b <= B;
+					sub_a <= A;
+					sub_b <= B;
                     sub_result <= sub_b - sub_a;
                     C[1] <= sub_result[1];
                     zero <= C[1] == 1'b0;
@@ -74,8 +76,8 @@ always @ (posedge clk) begin
                     zero <= zero & (C[2] == 1'b0);
                 end
                 3'b010: begin //SUB operation on next bit
-		    sub_a <= A;
-		    sub_b <= B;
+					sub_a <= A;
+					sub_b <= B;
                     sub_result <= sub_b - sub_a;
                     C[2] <= sub_result[2];
                     zero <= C[2] == 1'b0;
@@ -100,8 +102,8 @@ always @ (posedge clk) begin
                     zero <= C == 4'b0000;
                 end
                 3'b010: begin //SUB operation on MSBs
-		    sub_a <= A;
-		    sub_b <= B;
+					sub_a <= A;
+					sub_b <= B;
                     {carr, sub_result} <= sub_b - sub_a;
                     C[3] <= sub_result[3];
                     zero <= C == 4'b0000;
@@ -122,4 +124,4 @@ always @ (posedge clk) begin
         end
     endcase
 end
-endmodule 
+endmodule
